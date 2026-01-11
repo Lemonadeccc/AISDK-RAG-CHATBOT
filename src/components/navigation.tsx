@@ -1,7 +1,23 @@
-import { SignInButton, SignOutButton, SignUpButton, SignedIn, SignedOut } from "@clerk/nextjs"
-import { Button } from './ui/button'
+"use client"
+import {
+  SignInButton,
+  SignOutButton,
+  SignUpButton,
+  SignedIn,
+  SignedOut,
+  useAuth,
+} from "@clerk/nextjs"
+import Link from "next/link"
+import { usePathname } from "next/navigation"
+import { Button } from "./ui/button"
 
 export const Navigation = () => {
+  const { sessionClaims } = useAuth()
+  const pathname = usePathname()
+  const isAdmin = sessionClaims?.metadata?.role === "admin"
+  const showUpload = isAdmin && pathname === "/chat"
+  const showChat = isAdmin && pathname === "/upload"
+
   return (
     <nav className="border-b border-[var(oklch(0.145 0 0))]/10">
       <div className="flex container h-16 items-center justify-between px-4 mx-auto">
@@ -18,6 +34,16 @@ export const Navigation = () => {
           </SignedOut>
 
           <SignedIn>
+            {showUpload && (
+              <Button asChild variant="outline">
+                <Link href="/upload">Upload</Link>
+              </Button>
+            )}
+            {showChat && (
+              <Button asChild variant="outline">
+                <Link href="/chat">Chat</Link>
+              </Button>
+            )}
             <SignOutButton>
               <Button variant="outline">Sign Out</Button>
             </SignOutButton>
